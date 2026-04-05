@@ -9,7 +9,7 @@
 //   <script>window.API_BASE = 'https://tu-backend.onrender.com/api/v1'</script>
 // Si no está definido, usa localhost para desarrollo local.
 const API_BASE = window.API_BASE || 'http://localhost:8000/api/v1';
-const USER_ID  = 'demo-user-id';
+const USER_ID = 'b8a6c30d-4b4d-4707-adc1-c16184261bce';
 const TENANT_ID = 1;
 
 // ── State ────────────────────────────────────────────────────────────────
@@ -60,7 +60,7 @@ async function apiFetch(path, options = {}) {
   const res = await fetch(url, opts);
   if (!res.ok) {
     let msg = `HTTP ${res.status}`;
-    try { const d = await res.json(); msg = d.detail || d.message || msg; } catch {}
+    try { const d = await res.json(); msg = d.detail || d.message || msg; } catch { }
     throw new Error(msg);
   }
   if (res.status === 204) return null;
@@ -72,7 +72,7 @@ async function apiFetch(path, options = {}) {
 // ════════════════════════════════════════════════════════════════════════
 
 async function checkApiHealth() {
-  const dot  = document.getElementById('status-dot');
+  const dot = document.getElementById('status-dot');
   const label = document.getElementById('status-label');
   dot.className = 'status-indicator checking';
   label.textContent = 'Connecting…';
@@ -104,12 +104,12 @@ async function loadDashboard() {
     let totalDocs = 0, totalChunks = 0;
     state.agents.forEach(a => {
       if (a.knowledge_base) {
-        totalDocs   += a.knowledge_base.total_documents;
+        totalDocs += a.knowledge_base.total_documents;
         totalChunks += a.knowledge_base.total_chunks;
       }
     });
 
-    document.getElementById('stat-docs').textContent   = totalDocs;
+    document.getElementById('stat-docs').textContent = totalDocs;
     document.getElementById('stat-chunks').textContent = formatNum(totalChunks);
 
     // Sessions
@@ -255,18 +255,18 @@ async function submitAgentForm(e) {
   const isEdit = !!editId;
 
   const payload = {
-    name:          document.getElementById('agent-name').value.trim(),
-    topic:         document.getElementById('agent-topic').value.trim(),
-    description:   document.getElementById('agent-description').value.trim(),
+    name: document.getElementById('agent-name').value.trim(),
+    topic: document.getElementById('agent-topic').value.trim(),
+    description: document.getElementById('agent-description').value.trim(),
     system_prompt: document.getElementById('agent-system-prompt').value.trim(),
-    llm_model:     document.getElementById('agent-llm-model').value || null,
+    llm_model: document.getElementById('agent-llm-model').value || null,
     llm_temperature: parseFloat(document.getElementById('agent-temperature').value),
-    llm_max_tokens:  parseInt(document.getElementById('agent-max-tokens').value) || null,
+    llm_max_tokens: parseInt(document.getElementById('agent-max-tokens').value) || null,
   };
 
   const spinner = document.getElementById('submit-agent-spinner');
-  const label   = document.getElementById('submit-agent-label');
-  const btn     = document.getElementById('submit-agent-btn');
+  const label = document.getElementById('submit-agent-label');
+  const btn = document.getElementById('submit-agent-btn');
 
   label.style.display = 'none';
   spinner.style.display = 'inline-block';
@@ -310,7 +310,7 @@ async function deactivateAgent(agentId, name) {
 
 async function openAgentDetail(agentId) {
   const overlay = document.getElementById('agent-detail-overlay');
-  const body    = document.getElementById('agent-detail-body');
+  const body = document.getElementById('agent-detail-body');
   overlay.classList.add('active');
   body.innerHTML = `<div class="loading-state"><div class="spinner"></div></div>`;
 
@@ -318,7 +318,7 @@ async function openAgentDetail(agentId) {
     const a = await apiFetch(`/agents/${agentId}`);
     const kb = a.knowledge_base;
 
-    document.getElementById('detail-agent-name').textContent  = a.name;
+    document.getElementById('detail-agent-name').textContent = a.name;
     document.getElementById('detail-agent-topic').textContent = a.topic;
 
     body.innerHTML = `
@@ -570,7 +570,7 @@ async function uploadFiles(files) {
         refreshDocuments();
       } else {
         let errMsg = 'Upload failed';
-        try { const d = await res.json(); errMsg = d.detail || errMsg; } catch {}
+        try { const d = await res.json(); errMsg = d.detail || errMsg; } catch { }
         if (pb) pb.style.width = '100%';
         if (st) { st.textContent = 'Failed'; st.className = 'upload-status error'; }
         showToast(`Failed: ${errMsg}`, 'error');
@@ -640,8 +640,8 @@ async function loadChatAgentSelector() {
 }
 
 function updateChatAgent() {
-  const sel  = document.getElementById('chat-agent-select');
-  const val  = sel.value;
+  const sel = document.getElementById('chat-agent-select');
+  const val = sel.value;
   const label = document.getElementById('chat-agent-label');
   const badge = document.getElementById('chat-agent-badge');
 
@@ -676,7 +676,7 @@ async function loadSession(sessionId) {
     container.innerHTML = '';
     history.messages.forEach(msg => appendMessage(msg.role, msg.content, {
       agentName: msg.agent_name,
-      sources:   msg.sources,
+      sources: msg.sources,
       timestamp: msg.created_at,
     }));
     container.scrollTop = container.scrollHeight;
@@ -745,7 +745,7 @@ async function sendMessage() {
   if (state.chat.sending) return;
 
   const input = document.getElementById('chat-input');
-  const msg   = input.value.trim();
+  const msg = input.value.trim();
   if (!msg) return;
 
   // Clear welcome
@@ -767,11 +767,11 @@ async function sendMessage() {
 
   try {
     const body = {
-      user_id:    USER_ID,
-      message:    msg,
+      user_id: USER_ID,
+      message: msg,
       session_id: state.chat.sessionId || undefined,
-      agent_id:   state.chat.agentId   || undefined,
-      tenant_id:  TENANT_ID,
+      agent_id: state.chat.agentId || undefined,
+      tenant_id: TENANT_ID,
     };
 
     const res = await apiFetch('/chat', { method: 'POST', body: JSON.stringify(body) });
@@ -782,11 +782,11 @@ async function sendMessage() {
     document.getElementById('chat-session-id').textContent = `Session: ${res.session_id.slice(0, 8)}…`;
 
     appendMessage('assistant', res.answer, {
-      agentName:     res.agent_used?.name,
-      agentTopic:    res.agent_used?.topic,
-      sources:       res.sources,
+      agentName: res.agent_used?.name,
+      agentTopic: res.agent_used?.topic,
+      sources: res.sources,
       routingReason: res.routing_reason,
-      tokens:        `${res.prompt_tokens + res.completion_tokens} tokens`,
+      tokens: `${res.prompt_tokens + res.completion_tokens} tokens`,
     });
 
     await loadChatSessions();
@@ -884,7 +884,7 @@ function removeTypingIndicator(id) {
 }
 
 function showSources(sources) {
-  const panel   = document.getElementById('sources-panel');
+  const panel = document.getElementById('sources-panel');
   const content = document.getElementById('sources-content');
   panel.style.display = 'block';
 
