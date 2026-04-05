@@ -52,7 +52,7 @@ def _model_to_message(m: ChatMessageModel) -> ChatMessage:
     return ChatMessage(
         id=m.id,
         session_id=m.session_id,
-        role=ChatMessageRole(m.role.value),
+        role=ChatMessageRole(m.role),
         content=m.content,
         agent_id=m.agent_id,
         agent_name=m.agent_name,

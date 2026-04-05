@@ -43,7 +43,7 @@ def _model_to_kb(m: KnowledgeBaseModel) -> KnowledgeBase:
         pinecone_namespace=m.pinecone_namespace,
         embedding_model=m.embedding_model,
         embedding_dimension=m.embedding_dimension,
-        status=m.status.value,
+        status=m.status,
         total_documents=m.total_documents,
         total_chunks=m.total_chunks,
         created_at=m.created_at,
