@@ -32,6 +32,12 @@ from app.infrastructure.db.repositories.document_repository import (
     DocumentRepository,
     DocumentChunkRepository,
 )
+from app.infrastructure.db.session import AsyncSessionFactory
+from app.infrastructure.db.repositories.document_repository import (
+    DocumentRepository as _DocumentRepository,
+    DocumentChunkRepository as _DocumentChunkRepository,
+)
+from app.infrastructure.db.repositories.agent_repository import KnowledgeBaseRepository as _KBRepository
 from app.infrastructure.storage.s3_client import S3StorageClient
 from app.infrastructure.embeddings.google_embedding_client import IEmbeddingClient
 from app.infrastructure.pinecone.pinecone_client import PineconeClient
@@ -158,61 +164,87 @@ class UploadDocumentService:
     ) -> None:
         """
         Background task: parse → chunk → embed → upsert → update status.
+
+        IMPORTANT: This runs AFTER the HTTP request has ended, so the
+        request-scoped DB session is already closed. We open a fresh
+        independent session here so all DB writes are properly committed.
         """
-        try:
-            await self._document_repo.update_status(
-                document_id, DocumentStatus.PROCESSING.value
-            )
+        async with AsyncSessionFactory() as session:
+            try:
+                # Fresh repos bound to the new session
+                doc_repo = _DocumentRepository(session)
+                chunk_repo = _DocumentChunkRepository(session)
+                kb_repo = _KBRepository(session)
 
-            # Parse text from raw bytes
-            text = self._parser.parse(content, filename)
-            if not text.strip():
-                raise ValueError("Document produced no extractable text")
+                await doc_repo.update_status(
+                    document_id, DocumentStatus.PROCESSING.value
+                )
+                await session.commit()
 
-            # Ingest into Pinecone
-            ingestion_svc = VectorIngestionService(
-                embedding_client=self._embedding,
-                pinecone_client=self._pinecone,
-                chunk_repo=self._chunk_repo,
-            )
-            result = await ingestion_svc.ingest(
-                text=text,
-                document_id=document_id,
-                agent_id=agent_id,
-                namespace=namespace,
-                filename=filename,
-            )
+                # Parse text from raw bytes
+                text = self._parser.parse(content, filename)
+                if not text.strip():
+                    raise ValueError("Document produced no extractable text")
 
-            # Mark as ready
-            await self._document_repo.update_after_processing(
-                document_id=document_id,
-                total_chunks=result.total_chunks,
-                embedding_model=result.embedding_model,
-            )
-
-            # Update KB counters
-            kb = await self._kb_repo.get_by_agent_id(agent_id)
-            if kb:
-                await self._kb_repo.update_counts(
-                    kb_id=kb.id,
-                    documents_delta=1,
-                    chunks_delta=result.total_chunks,
+                # Ingest into Pinecone + persist chunks in DB
+                ingestion_svc = VectorIngestionService(
+                    embedding_client=self._embedding,
+                    pinecone_client=self._pinecone,
+                    chunk_repo=chunk_repo,
+                )
+                result = await ingestion_svc.ingest(
+                    text=text,
+                    document_id=document_id,
+                    agent_id=agent_id,
+                    namespace=namespace,
+                    filename=filename,
                 )
 
-            logger.info(
-                "Document processing complete",
-                document_id=document_id,
-                total_chunks=result.total_chunks,
-            )
+                # Mark document as ready
+                await doc_repo.update_after_processing(
+                    document_id=document_id,
+                    total_chunks=result.total_chunks,
+                    embedding_model=result.embedding_model,
+                )
 
-        except Exception as exc:
-            logger.error(
-                "Document processing failed",
-                document_id=document_id,
-                error=str(exc),
-            )
-            await self._document_repo.update_status(
-                document_id,
-                DocumentStatus.FAILED.value,
-                error_message=str(exc),
-            )
+                # Update KB counters
+                kb = await kb_repo.get_by_agent_id(agent_id)
+                if kb:
+                    await kb_repo.update_counts(
+                        kb_id=kb.id,
+                        documents_delta=1,
+                        chunks_delta=result.total_chunks,
+                    )
+
+                await session.commit()
+
+                logger.info(
+                    "Document processing complete",
+                    document_id=document_id,
+                    total_chunks=result.total_chunks,
+                )
+
+            except Exception as exc:
+                await session.rollback()
+                logger.error(
+                    "Document processing failed",
+                    document_id=document_id,
+                    error=str(exc),
+                )
+                # Open another session just for the error status update
+                async with AsyncSessionFactory() as err_session:
+                    try:
+                        err_doc_repo = _DocumentRepository(err_session)
+                        await err_doc_repo.update_status(
+                            document_id,
+                            DocumentStatus.FAILED.value,
+                            error_message=str(exc),
+                        )
+                        await err_session.commit()
+                    except Exception as inner_exc:
+                        logger.error(
+                            "Failed to mark document as FAILED",
+                            document_id=document_id,
+                            error=str(inner_exc),
+                        )
+                        await err_session.rollback()
