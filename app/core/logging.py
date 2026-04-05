@@ -17,13 +17,12 @@ def configure_logging() -> None:
 
     shared_processors: list[structlog.types.Processor] = [
         structlog.contextvars.merge_contextvars,
-        structlog.stdlib.add_logger_name,
+        #structlog.stdlib.add_logger_name,
         structlog.stdlib.add_log_level,
         structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.processors.TimeStamper(fmt="iso"),
         structlog.processors.StackInfoRenderer(),
     ]
-
     if settings.is_production:
         # JSON output for log aggregation (Datadog, CloudWatch, etc.)
         processors = shared_processors + [
@@ -42,7 +41,8 @@ def configure_logging() -> None:
             getattr(logging, settings.log_level)
         ),
         context_class=dict,
-        logger_factory=structlog.PrintLoggerFactory(file=sys.stdout),
+        #logger_factory=structlog.PrintLoggerFactory(file=sys.stdout),
+        logger_factory=structlog.stdlib.LoggerFactory(),
         cache_logger_on_first_use=True,
     )
 
