@@ -14,7 +14,7 @@ from __future__ import annotations
 import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Any, Optional
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
@@ -112,17 +112,20 @@ class VectorIngestionService:
             vector_ids.append(vector_id)
 
             # Pinecone metadata — full text is stored here for retrieval
-            metadata = {
+            # NOTE: Pinecone rejects null values; omit page_from/page_to when unknown.
+            metadata: dict[str, Any] = {
                 "chunk_id": vector_id,
                 "document_id": document_id,
                 "agent_id": agent_id,
                 "filename": filename,
                 "text": chunk.text,
                 "chunk_index": chunk.chunk_index,
-                "page_from": chunk.page_from,
-                "page_to": chunk.page_to,
                 "created_at": now_iso,
             }
+            if chunk.page_from is not None:
+                metadata["page_from"] = chunk.page_from
+            if chunk.page_to is not None:
+                metadata["page_to"] = chunk.page_to
 
             pinecone_records.append(
                 VectorRecord(id=vector_id, values=vector, metadata=metadata)
