@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NeuralFlux — Multi-Agent AI Platform</title>
-  <meta name="description" content="A production-ready multi-agent AI platform powered by LangGraph, Amazon Bedrock, Pinecone, and Google Gemini Embeddings." />
+  <meta name="description"
+    content="A production-ready multi-agent AI platform powered by LangGraph, Amazon Bedrock, Pinecone, and Google Gemini Embeddings." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
   <div id="app">
     <!-- Sidebar -->
@@ -17,13 +22,15 @@
       <div class="sidebar-logo">
         <div class="logo-icon">
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <path d="M14 2L25 8V20L14 26L3 20V8L14 2Z" fill="url(#logoGrad)" stroke="rgba(0,212,255,0.4)" stroke-width="0.5"/>
-            <circle cx="14" cy="14" r="4" fill="rgba(0,212,255,0.9)"/>
-            <path d="M14 6V10M14 18V22M6 14H10M18 14H22" stroke="rgba(0,212,255,0.6)" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M14 2L25 8V20L14 26L3 20V8L14 2Z" fill="url(#logoGrad)" stroke="rgba(0,212,255,0.4)"
+              stroke-width="0.5" />
+            <circle cx="14" cy="14" r="4" fill="rgba(0,212,255,0.9)" />
+            <path d="M14 6V10M14 18V22M6 14H10M18 14H22" stroke="rgba(0,212,255,0.6)" stroke-width="1.5"
+              stroke-linecap="round" />
             <defs>
               <linearGradient id="logoGrad" x1="3" y1="2" x2="25" y2="26" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#0a1628"/>
-                <stop offset="100%" stop-color="#0d2040"/>
+                <stop offset="0%" stop-color="#0a1628" />
+                <stop offset="100%" stop-color="#0d2040" />
               </linearGradient>
             </defs>
           </svg>
@@ -37,29 +44,35 @@
       <nav class="sidebar-nav">
         <a href="#" class="nav-item active" data-page="dashboard" id="nav-dashboard" onclick="navigate('dashboard')">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
           </svg>
           <span>Dashboard</span>
         </a>
         <a href="#" class="nav-item" data-page="agents" id="nav-agents" onclick="navigate('agents')">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-            <circle cx="19" cy="9" r="2.5"/><path d="M19 12v2"/>
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+            <circle cx="19" cy="9" r="2.5" />
+            <path d="M19 12v2" />
           </svg>
           <span>Agents</span>
         </a>
         <a href="#" class="nav-item" data-page="documents" id="nav-documents" onclick="navigate('documents')">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/>
-            <line x1="9" y1="17" x2="15" y2="17"/><polyline points="9 9 10 9"/>
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="9" y1="13" x2="15" y2="13" />
+            <line x1="9" y1="17" x2="15" y2="17" />
+            <polyline points="9 9 10 9" />
           </svg>
           <span>Documents</span>
         </a>
         <a href="#" class="nav-item" data-page="chat" id="nav-chat" onclick="navigate('chat')">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
           <span>Chat</span>
           <span class="nav-badge" id="chat-badge" style="display:none">●</span>
@@ -94,7 +107,7 @@
           </div>
           <button class="btn btn-primary" onclick="navigate('chat')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
             Start Chat
           </button>
@@ -104,7 +117,8 @@
           <div class="stat-card">
             <div class="stat-icon" style="background: linear-gradient(135deg,#00d4ff22,#00d4ff11);">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2">
-                <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
               </svg>
             </div>
             <div class="stat-info">
@@ -116,8 +130,8 @@
           <div class="stat-card">
             <div class="stat-icon" style="background: linear-gradient(135deg,#7c3aed22,#7c3aed11);">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
               </svg>
             </div>
             <div class="stat-info">
@@ -129,7 +143,7 @@
           <div class="stat-card">
             <div class="stat-icon" style="background: linear-gradient(135deg,#10b98122,#10b98111);">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
               </svg>
             </div>
             <div class="stat-info">
@@ -141,7 +155,7 @@
           <div class="stat-card">
             <div class="stat-icon" style="background: linear-gradient(135deg,#f59e0b22,#f59e0b11);">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
             </div>
             <div class="stat-info">
@@ -159,7 +173,10 @@
               <button class="btn btn-sm btn-ghost" onclick="navigate('agents')">View all →</button>
             </div>
             <div id="dashboard-agents-list" class="agents-preview-list">
-              <div class="skeleton-loader"><div class="sk sk-line"></div><div class="sk sk-line short"></div></div>
+              <div class="skeleton-loader">
+                <div class="sk sk-line"></div>
+                <div class="sk sk-line short"></div>
+              </div>
             </div>
           </div>
           <div class="card">
@@ -169,27 +186,33 @@
             <div class="tech-stack-grid">
               <div class="tech-item">
                 <div class="tech-icon bedrock">B</div>
-                <div class="tech-info"><span class="tech-name">Amazon Bedrock</span><span class="tech-role">LLM Generation</span></div>
+                <div class="tech-info"><span class="tech-name">Amazon Bedrock</span><span class="tech-role">LLM
+                    Generation</span></div>
               </div>
               <div class="tech-item">
                 <div class="tech-icon pinecone">P</div>
-                <div class="tech-info"><span class="tech-name">Pinecone</span><span class="tech-role">Vector Database</span></div>
+                <div class="tech-info"><span class="tech-name">Pinecone</span><span class="tech-role">Vector
+                    Database</span></div>
               </div>
               <div class="tech-item">
                 <div class="tech-icon gemini">G</div>
-                <div class="tech-info"><span class="tech-name">Gemini Embeddings</span><span class="tech-role">gemini-embedding-002</span></div>
+                <div class="tech-info"><span class="tech-name">Gemini Embeddings</span><span
+                    class="tech-role">gemini-embedding-002</span></div>
               </div>
               <div class="tech-item">
                 <div class="tech-icon langgraph">L</div>
-                <div class="tech-info"><span class="tech-name">LangGraph</span><span class="tech-role">Agent Orchestration</span></div>
+                <div class="tech-info"><span class="tech-name">LangGraph</span><span class="tech-role">Agent
+                    Orchestration</span></div>
               </div>
               <div class="tech-item">
                 <div class="tech-icon fastapi">F</div>
-                <div class="tech-info"><span class="tech-name">FastAPI</span><span class="tech-role">Backend API</span></div>
+                <div class="tech-info"><span class="tech-name">FastAPI</span><span class="tech-role">Backend API</span>
+                </div>
               </div>
               <div class="tech-item">
                 <div class="tech-icon postgres">D</div>
-                <div class="tech-info"><span class="tech-name">PostgreSQL</span><span class="tech-role">Relational Storage</span></div>
+                <div class="tech-info"><span class="tech-name">PostgreSQL</span><span class="tech-role">Relational
+                    Storage</span></div>
               </div>
             </div>
           </div>
@@ -201,7 +224,10 @@
           </div>
           <div class="flow-diagram">
             <div class="flow-node user-node">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+              </svg>
               <span>User Query</span>
             </div>
             <div class="flow-arrow">→</div>
@@ -241,7 +267,10 @@
             <p class="page-subtitle">Create and manage your specialized AI knowledge agents</p>
           </div>
           <button class="btn btn-primary" id="btn-create-agent" onclick="openCreateAgentModal()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
             New Agent
           </button>
         </div>
@@ -268,7 +297,9 @@
             <h2 class="card-title">Select Agent</h2>
           </div>
           <div class="agent-selector" id="doc-agent-selector">
-            <div class="loading-state small"><div class="spinner sm"></div><span>Loading…</span></div>
+            <div class="loading-state small">
+              <div class="spinner sm"></div><span>Loading…</span>
+            </div>
           </div>
         </div>
 
@@ -279,13 +310,16 @@
           <div class="drop-zone" id="drop-zone">
             <div class="drop-zone-icon">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
             </div>
-            <p class="drop-zone-text">Drag & drop files here or <span class="link-text" onclick="document.getElementById('file-input').click()">browse</span></p>
+            <p class="drop-zone-text">Drag & drop files here or <span class="link-text"
+                onclick="document.getElementById('file-input').click()">browse</span></p>
             <p class="drop-zone-hint">PDF, TXT, MD — max 50MB per file</p>
-            <input type="file" id="file-input" multiple accept=".pdf,.txt,.md,.docx" style="display:none" onchange="handleFileSelect(event)" />
+            <input type="file" id="file-input" multiple accept=".pdf,.txt,.md,.docx" style="display:none"
+              onchange="handleFileSelect(event)" />
           </div>
 
           <div id="upload-queue" style="display:none; margin-top:1rem;">
@@ -300,7 +334,9 @@
             <button class="btn btn-sm btn-ghost" onclick="refreshDocuments()">↻ Refresh</button>
           </div>
           <div id="documents-table-container">
-            <div class="loading-state"><div class="spinner"></div></div>
+            <div class="loading-state">
+              <div class="spinner"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -313,7 +349,10 @@
             <div class="sessions-header">
               <h2 class="sessions-title">Conversations</h2>
               <button class="btn btn-sm btn-ghost" onclick="newChatSession()" title="New chat">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
               </button>
             </div>
             <div class="agent-filter-section">
@@ -323,7 +362,9 @@
               </select>
             </div>
             <div id="sessions-list" class="sessions-list">
-              <div class="loading-state small"><div class="spinner sm"></div></div>
+              <div class="loading-state small">
+                <div class="spinner sm"></div>
+              </div>
             </div>
           </div>
 
@@ -338,7 +379,11 @@
                 <span class="chat-session-id" id="chat-session-id"></span>
               </div>
               <button class="btn btn-sm btn-ghost" onclick="clearChatMessages()" title="Clear view">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  <path d="M10 11v6M14 11v6" />
+                </svg>
               </button>
             </div>
 
@@ -346,16 +391,25 @@
               <div class="welcome-message" id="welcome-message">
                 <div class="welcome-icon">
                   <svg width="48" height="48" viewBox="0 0 28 28" fill="none">
-                    <path d="M14 2L25 8V20L14 26L3 20V8L14 2Z" fill="url(#wGrad)" stroke="rgba(0,212,255,0.3)" stroke-width="0.5"/>
-                    <circle cx="14" cy="14" r="4" fill="rgba(0,212,255,0.9)"/>
-                    <path d="M14 6V10M14 18V22M6 14H10M18 14H22" stroke="rgba(0,212,255,0.6)" stroke-width="1.5" stroke-linecap="round"/>
-                    <defs><linearGradient id="wGrad" x1="3" y1="2" x2="25" y2="26"><stop offset="0%" stop-color="#0a1628"/><stop offset="100%" stop-color="#0d2040"/></linearGradient></defs>
+                    <path d="M14 2L25 8V20L14 26L3 20V8L14 2Z" fill="url(#wGrad)" stroke="rgba(0,212,255,0.3)"
+                      stroke-width="0.5" />
+                    <circle cx="14" cy="14" r="4" fill="rgba(0,212,255,0.9)" />
+                    <path d="M14 6V10M14 18V22M6 14H10M18 14H22" stroke="rgba(0,212,255,0.6)" stroke-width="1.5"
+                      stroke-linecap="round" />
+                    <defs>
+                      <linearGradient id="wGrad" x1="3" y1="2" x2="25" y2="26">
+                        <stop offset="0%" stop-color="#0a1628" />
+                        <stop offset="100%" stop-color="#0d2040" />
+                      </linearGradient>
+                    </defs>
                   </svg>
                 </div>
                 <h2 class="welcome-title">NeuralFlux AI</h2>
-                <p class="welcome-text">Ask anything. The orchestrator will automatically route your query to the best specialized agent based on your knowledge base.</p>
+                <p class="welcome-text">Ask anything. The orchestrator will automatically route your query to the best
+                  specialized agent based on your knowledge base.</p>
                 <div class="quick-prompts">
-                  <button class="quick-prompt" onclick="setQuickPrompt(this)">What documents have been uploaded?</button>
+                  <button class="quick-prompt" onclick="setQuickPrompt(this)">What documents have been
+                    uploaded?</button>
                   <button class="quick-prompt" onclick="setQuickPrompt(this)">Summarize the available knowledge</button>
                   <button class="quick-prompt" onclick="setQuickPrompt(this)">What topics can you help me with?</button>
                 </div>
@@ -366,22 +420,18 @@
               <div id="sources-panel" class="sources-panel" style="display:none">
                 <div class="sources-panel-header">
                   <span>📚 Sources</span>
-                  <button onclick="document.getElementById('sources-panel').style.display='none'" class="btn-icon">✕</button>
+                  <button onclick="document.getElementById('sources-panel').style.display='none'"
+                    class="btn-icon">✕</button>
                 </div>
                 <div id="sources-content"></div>
               </div>
               <div class="input-wrapper">
-                <textarea
-                  id="chat-input"
-                  class="chat-textarea"
-                  placeholder="Ask your agents anything…"
-                  rows="1"
-                  onkeydown="handleChatKeydown(event)"
-                  oninput="autoResize(this)"
-                ></textarea>
+                <textarea id="chat-input" class="chat-textarea" placeholder="Ask your agents anything…" rows="1"
+                  onkeydown="handleChatKeydown(event)" oninput="autoResize(this)"></textarea>
                 <button class="send-btn" id="send-btn" onclick="sendMessage()">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
                   </svg>
                 </button>
               </div>
@@ -400,7 +450,10 @@
       <div class="modal-header">
         <h2 class="modal-title" id="modal-title">Create New Agent</h2>
         <button class="btn-icon" onclick="closeCreateAgentModal()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
         </button>
       </div>
       <form id="agent-form" class="modal-form" onsubmit="submitAgentForm(event)">
@@ -408,16 +461,19 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" for="agent-name">Agent Name <span class="required">*</span></label>
-            <input type="text" id="agent-name" class="form-input" placeholder="e.g. HP Printer Support" required maxlength="255" />
+            <input type="text" id="agent-name" class="form-input" placeholder="e.g. HP Printer Support" required
+              maxlength="255" />
           </div>
           <div class="form-group">
             <label class="form-label" for="agent-topic">Topic <span class="required">*</span></label>
-            <input type="text" id="agent-topic" class="form-input" placeholder="e.g. HP Printers" required maxlength="255" />
+            <input type="text" id="agent-topic" class="form-input" placeholder="e.g. HP Printers" required
+              maxlength="255" />
           </div>
         </div>
         <div class="form-group">
           <label class="form-label" for="agent-description">Description</label>
-          <input type="text" id="agent-description" class="form-input" placeholder="Brief description of what this agent specializes in" maxlength="2000" />
+          <input type="text" id="agent-description" class="form-input"
+            placeholder="Brief description of what this agent specializes in" maxlength="2000" />
         </div>
         <div class="form-group">
           <label class="form-label" for="agent-system-prompt">System Prompt <span class="required">*</span></label>
@@ -439,7 +495,8 @@
           <div class="form-group">
             <label class="form-label" for="agent-temperature">Temperature</label>
             <div class="range-wrapper">
-              <input type="range" id="agent-temperature" class="form-range" min="0" max="1" step="0.05" value="0.3" oninput="document.getElementById('temp-val').textContent=this.value" />
+              <input type="range" id="agent-temperature" class="form-range" min="0" max="1" step="0.05" value="0.3"
+                oninput="document.getElementById('temp-val').textContent=this.value" />
               <span class="range-value" id="temp-val">0.3</span>
             </div>
           </div>
@@ -468,18 +525,28 @@
           <p class="modal-subtitle" id="detail-agent-topic"></p>
         </div>
         <button class="btn-icon" onclick="closeAgentDetail()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
         </button>
       </div>
       <div class="modal-body" id="agent-detail-body">
-        <div class="loading-state"><div class="spinner"></div></div>
+        <div class="loading-state">
+          <div class="spinner"></div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Toast notifications -->
   <div id="toast-container" class="toast-container"></div>
-
+  <script>
+    window.API_BASE = window.location.hostname.includes('localhost')
+      ? 'http://localhost:8000/api/v1'
+      : 'https://multiagent-backend-l32r.onrender.com/api/v1';
+  </script>
   <script src="app.js"></script>
 </body>
+
 </html>
