@@ -25,7 +25,7 @@ env/
 service-account.json
 *-service-account.json
 credentials/          # carpeta con JSON keys de Google Cloud
-*.json                # archivos JSON de credenciales (cuidado: esto excluye todos los JSON)
+#*.json                # archivos JSON de credenciales (cuidado: esto excluye todos los JSON)
 
 # ── IDE ───────────────────────────────────────────────────────────────────────
 .idea/
