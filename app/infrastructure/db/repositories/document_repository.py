@@ -27,7 +27,7 @@ def _model_to_document(m: DocumentModel) -> Document:
         file_size_bytes=m.file_size_bytes,
         storage_path=m.storage_path,
         storage_bucket=m.storage_bucket,
-        status=DocumentStatus(m.status.value),
+        status=DocumentStatus(m.status),
         error_message=m.error_message,
         total_chunks=m.total_chunks,
         embedding_model=m.embedding_model,
