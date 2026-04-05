@@ -1,0 +1,56 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Virtual environments ───────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+.env.local
+.env.staging
+.env.production
+
+# ── Secrets — NEVER commit these ──────────────────────────────────────────────
+.env
+*.pem
+*.key
+service-account.json
+*-service-account.json
+credentials/          # carpeta con JSON keys de Google Cloud
+*.json                # archivos JSON de credenciales (cuidado: esto excluye todos los JSON)
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Alembic ────────────────────────────────────────────────────────────────────
+# Keep versions directory but ignore compiled bytecode
+app/infrastructure/db/migrations/versions/*.pyc
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Uploads (local dev only) ──────────────────────────────────────────────────
+uploads/
+tmp/

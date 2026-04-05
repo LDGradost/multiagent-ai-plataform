@@ -1,0 +1,327 @@
+### ═══════════════════════════════════════════════════════════════
+### FASE 8 — End-to-End Demo  (VS Code REST Client / IntelliJ HTTP)
+### Backend:  http://localhost:8000
+### Variables: Actualiza @agent_id y @document_id tras cada request.
+### ═══════════════════════════════════════════════════════════════
+
+@baseUrl = http://localhost:8000/api/v1
+@userId  = demo-user-id
+@tenantId = 1
+
+
+### ─────────────────────────────────────────────────────────────
+### 0. HEALTH CHECK
+### Verifica que el servidor esté corriendo.
+### ─────────────────────────────────────────────────────────────
+
+GET http://localhost:8000/health
+Accept: application/json
+
+
+###
+
+GET http://localhost:8000/docs
+Accept: text/html
+
+
+### ─────────────────────────────────────────────────────────────
+### 1. CREAR AGENTE
+### POST /api/v1/agents
+###
+### Crea un agente especializado en impresoras HP.
+### Persiste en PostgreSQL + genera namespace Pinecone lógico.
+### NO crea índice en Pinecone (solo namespace lógico).
+### ─────────────────────────────────────────────────────────────
+
+# @name createAgent
+POST {{baseUrl}}/agents?user_id={{userId}}&tenant_id={{tenantId}}
+Content-Type: application/json
+
+{
+  "name": "HP LaserJet Expert",
+  "topic": "Impresoras HP LaserJet",
+  "description": "Agente especializado en soporte técnico de impresoras HP LaserJet Pro.",
+  "system_prompt": "Eres un experto técnico en impresoras HP LaserJet. Responde únicamente basándote en la documentación técnica oficial de HP. Si la respuesta no está en el contexto, indica que no tienes suficiente información. Proporciona pasos claros cuando expliques procedimientos.",
+  "llm_model": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+  "llm_temperature": 0.1,
+  "llm_max_tokens": 2048
+}
+
+### ─────────────── Respuesta esperada ─────────────────────────
+# HTTP 201 Created
+# {
+#   "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+#   "user_id": "demo-user-id",
+#   "name": "HP LaserJet Expert",
+#   "topic": "Impresoras HP LaserJet",
+#   "pinecone_namespace": "tenant_1_user_demo-user-id_agent_xxxxxxxx",
+#   "embedding_model": "text-embedding-004",
+#   "llm_model": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+#   "llm_temperature": 0.1,
+#   "is_active": true,
+#   "knowledge_base": { "id": "...", "status": "active", "total_documents": 0, ... }
+# }
+
+# ► Copia el "id" del agente en la variable de abajo:
+@agent_id = PASTE_AGENT_ID_HERE
+
+
+### ─────────────────────────────────────────────────────────────
+### 1b. LISTAR AGENTES DEL USUARIO
+### ─────────────────────────────────────────────────────────────
+
+GET {{baseUrl}}/agents?user_id={{userId}}&active_only=true
+Accept: application/json
+
+
+###
+
+### ─────────────────────────────────────────────────────────────
+### 1c. VER DETALLE DEL AGENTE
+### ─────────────────────────────────────────────────────────────
+
+GET {{baseUrl}}/agents/{{agent_id}}
+Accept: application/json
+
+
+### ─────────────────────────────────────────────────────────────
+### 2. SUBIR DOCUMENTO AL AGENTE
+### POST /api/v1/agents/{agent_id}/documents
+###
+### Flujo: S3 upload → registro SQL (status=uploaded) →
+###        [background] parse → chunk → embed → Pinecone upsert
+### Retorna HTTP 202 Accepted (procesamiento en background).
+### ─────────────────────────────────────────────────────────────
+
+# NOTA: Para ejecutar este request en VS Code REST Client,
+# crea un archivo hp_manual.txt en el mismo directorio.
+# El archivo debe contener documentación técnica de HP.
+
+# @name uploadDocument
+POST {{baseUrl}}/agents/{{agent_id}}/documents?user_id={{userId}}
+Content-Type: multipart/form-data; boundary=----FormBoundary
+
+------FormBoundary
+Content-Disposition: form-data; name="file"; filename="hp_laserjet_manual.txt"
+Content-Type: text/plain
+
+MANUAL TÉCNICO HP LaserJet Pro M404dn
+
+1. ESPECIFICACIONES TÉCNICAS
+- Velocidad de impresión: 40 ppm
+- Resolución: 1200 x 1200 dpi
+- Ciclo de trabajo mensual: hasta 80,000 páginas
+- Conectividad: Ethernet Gigabit, Wi-Fi, USB 2.0
+- Memoria RAM: 256 MB
+
+2. CONSUMIBLES
+- Cartucho HP 58A (CF258A): ~3,000 páginas (estándar)
+- Cartucho HP 58X (CF258X): ~10,000 páginas (alta capacidad)
+- Unidad de imagen HP CF232A: ~23,000 páginas
+
+3. RESOLUCIÓN DE PROBLEMAS
+3.1 Atascos de papel
+    - Abra la cubierta superior y retire el papel.
+    - Use papel de gramaje 60-200 g/m².
+
+3.2 Calidad deficiente (rayas/manchas)
+    - Agite el cartucho suavemente de lado a lado.
+    - Reemplace si el problema persiste.
+
+3.3 Impresora no aparece en la red
+    - Verifique cable Ethernet.
+    - Imprima página de configuración de red.
+    - Verifique que el puerto 9100 no esté bloqueado.
+------FormBoundary--
+
+### ─────────────── Respuesta esperada ─────────────────────────
+# HTTP 202 Accepted
+# {
+#   "document": {
+#     "id": "yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy",
+#     "agent_id": "{{agent_id}}",
+#     "file_name": "hp_laserjet_manual.txt",
+#     "status": "uploaded",
+#     "total_chunks": 0
+#   },
+#   "processing_started": true
+# }
+
+# ► Copia el "id" del documento:
+@document_id = PASTE_DOCUMENT_ID_HERE
+
+
+### ─────────────────────────────────────────────────────────────
+### 2b. VERIFICAR ESTADO DEL DOCUMENTO (POLLING)
+### Repite hasta que status == "ready" o "failed"
+### ─────────────────────────────────────────────────────────────
+
+GET {{baseUrl}}/agents/{{agent_id}}/documents/{{document_id}}
+Accept: application/json
+
+### ─────────────── Respuesta esperada cuando listo ────────────
+# {
+#   "id": "...",
+#   "status": "ready",
+#   "total_chunks": 8,
+#   "embedding_model": "text-embedding-004",
+#   "processed_at": "2026-03-25T..."
+# }
+
+
+### ─────────────────────────────────────────────────────────────
+### 2c. LISTAR TODOS LOS DOCUMENTOS DEL AGENTE
+### ─────────────────────────────────────────────────────────────
+
+GET {{baseUrl}}/agents/{{agent_id}}/documents
+Accept: application/json
+
+
+### ─────────────────────────────────────────────────────────────
+### 3. CONSULTA VÍA ORQUESTADOR (AUTO-ROUTING)
+### POST /api/v1/chat
+###
+### Sin agent_id → el orquestador elige el agente correcto.
+### El orquestador usa Bedrock (Claude Haiku) para seleccionar.
+### El agente seleccionado hace RAG: embed query → Pinecone → Bedrock.
+### ─────────────────────────────────────────────────────────────
+
+# @name chatOrchestrated
+POST {{baseUrl}}/chat
+Content-Type: application/json
+
+{
+  "user_id": "{{userId}}",
+  "message": "¿Cuál es el cartucho de tóner de alta capacidad recomendado y cuántas páginas rinde?",
+  "tenant_id": 1
+}
+
+### ─────────────── Respuesta esperada ─────────────────────────
+# HTTP 200 OK
+# {
+#   "message_id": "...",
+#   "session_id": "...",
+#   "answer": "El cartucho de tóner HP 58X (CF258X) es el de alta capacidad...",
+#   "agent_used": {
+#     "id": "...",
+#     "name": "HP LaserJet Expert",
+#     "topic": "Impresoras HP LaserJet"
+#   },
+#   "sources": [
+#     {
+#       "document_id": "...",
+#       "filename": "hp_laserjet_manual.txt",
+#       "chunk_index": 2,
+#       "page_from": null,
+#       "page_to": null,
+#       "score": 0.9234
+#     }
+#   ],
+#   "prompt_tokens": 856,
+#   "completion_tokens": 124,
+#   "routing_reason": "Query is about HP printers, routing to HP LaserJet Expert agent.",
+#   "error": null
+# }
+
+# ► Copia el session_id para continuar la conversación:
+@session_id = PASTE_SESSION_ID_HERE
+
+
+### ─────────────────────────────────────────────────────────────
+### 3b. CONSULTA DIRECTA A UN AGENTE (bypass orquestador)
+### Proporciona agent_id para saltarse el routing.
+### ─────────────────────────────────────────────────────────────
+
+POST {{baseUrl}}/chat
+Content-Type: application/json
+
+{
+  "user_id": "{{userId}}",
+  "message": "¿Cómo soluciono un atasco de papel en la HP LaserJet Pro M404dn?",
+  "agent_id": "{{agent_id}}",
+  "session_id": "{{session_id}}",
+  "tenant_id": 1
+}
+
+
+### ─────────────────────────────────────────────────────────────
+### 3c. CONSULTA FUERA DE DOMINIO (debe responder que no sabe)
+### El agente debe ser honesto cuando no tiene información.
+### ─────────────────────────────────────────────────────────────
+
+POST {{baseUrl}}/chat
+Content-Type: application/json
+
+{
+  "user_id": "{{userId}}",
+  "message": "¿Cuál es el precio de la acción de Apple hoy?",
+  "tenant_id": 1
+}
+
+### ─────────────── Respuesta esperada ─────────────────────────
+# El orquestador debería retornar:
+# "routing_reason": "No agent found for this query"
+# "answer": "No encontré un agente especializado para responder esta consulta."
+
+
+### ─────────────────────────────────────────────────────────────
+### 4. HISTORIAL DE SESIÓN (respuesta con fuentes incluidas)
+### GET /api/v1/chat/sessions/{session_id}
+### ─────────────────────────────────────────────────────────────
+
+GET {{baseUrl}}/chat/sessions/{{session_id}}
+Accept: application/json
+
+### ─────────────── Respuesta esperada ─────────────────────────
+# {
+#   "session": { "id": "...", "title": "...", "is_active": true },
+#   "messages": [
+#     { "role": "user", "content": "¿Cuál es el cartucho...", "sources": [] },
+#     {
+#       "role": "assistant",
+#       "content": "El cartucho HP 58X...",
+#       "agent_name": "HP LaserJet Expert",
+#       "sources": [{ "filename": "...", "score": 0.92 }],
+#       "prompt_tokens": 856,
+#       "completion_tokens": 124
+#     }
+#   ]
+# }
+
+
+### ─────────────────────────────────────────────────────────────
+### 4b. LISTAR TODAS LAS SESIONES DEL USUARIO
+### ─────────────────────────────────────────────────────────────
+
+GET {{baseUrl}}/chat/sessions?user_id={{userId}}
+Accept: application/json
+
+
+### ─────────────────────────────────────────────────────────────
+### EXTRA — ACTUALIZAR AGENTE (PATCH)
+### ─────────────────────────────────────────────────────────────
+
+PATCH {{baseUrl}}/agents/{{agent_id}}
+Content-Type: application/json
+
+{
+  "description": "Soporte técnico HP LaserJet Pro y OfficeJet. Actualizado.",
+  "llm_temperature": 0.2
+}
+
+
+### ─────────────────────────────────────────────────────────────
+### EXTRA — ELIMINAR DOCUMENTO
+### Elimina de PostgreSQL, Pinecone y S3.
+### ─────────────────────────────────────────────────────────────
+
+DELETE {{baseUrl}}/agents/documents/{{document_id}}
+Accept: application/json
+
+
+### ─────────────────────────────────────────────────────────────
+### EXTRA — DESACTIVAR AGENTE (soft delete)
+### ─────────────────────────────────────────────────────────────
+
+DELETE {{baseUrl}}/agents/{{agent_id}}
+Accept: application/json
