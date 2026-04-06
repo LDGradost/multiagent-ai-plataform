@@ -114,7 +114,12 @@ class UploadDocumentService:
             content_type=data.content_type,
         )
 
-        # ── 4. Persist Document record ────────────────────────────────────────
+        # ── 4. Persist Document record in its own committed session ──────────
+        # CRITICAL: FastAPI background tasks run BEFORE get_db_session()
+        # commits the request transaction. If we use the request-scoped
+        # session the document row won't be visible when the background task
+        # tries to INSERT document_chunks (FK violation). We open a dedicated
+        # session and commit immediately so the record is DB-visible.
         document = Document(
             id=document_id,
             agent_id=data.agent_id,
@@ -133,7 +138,10 @@ class UploadDocumentService:
             uploaded_at=datetime.now(timezone.utc),
             processed_at=None,
         )
-        created_doc = await self._document_repo.create(document)
+        async with AsyncSessionFactory() as doc_session:
+            doc_repo = _DocumentRepository(doc_session)
+            created_doc = await doc_repo.create(document)
+            await doc_session.commit()
 
         # ── 5. Trigger background processing ─────────────────────────────────
         background_tasks.add_task(
